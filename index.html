@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ulangan Harian Pendidikan Pancasila - Kelas 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            /* Mencegah user menyeleksi teks untuk dicopy */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Menyembunyikan konten jika di-print (anti cheat tambahan) */
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+
+        /* Animasi sederhana untuk modal */
+        .modal-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Sembunyikan scrollbar untuk tampilan mobile yang lebih bersih */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-gray-800 h-screen w-screen overflow-hidden flex justify-center items-center" oncontextmenu="return false;">
+
+    <div id="app-container" class="w-full h-full sm:max-w-md sm:h-[85vh] sm:rounded-xl sm:shadow-2xl bg-gray-50 relative flex flex-col overflow-hidden border-x sm:border border-gray-200">
+        
+        <!-- ================= Halaman Login ================= -->
+        <div id="login-page" class="flex flex-col h-full bg-white p-6 justify-center">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 leading-tight">Ulangan Harian</h1>
+                <p class="text-blue-600 font-semibold mt-1">Pendidikan Pancasila</p>
+                <p class="text-sm text-gray-500 mt-2">Materi: Aturan, Norma, Hak, & Kewajiban</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="student-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Masukkan nama kamu..." autocomplete="off">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                    <select id="student-class" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="Kelas 4" selected>Kelas 4</option>
+                    </select>
+                </div>
+                
+                <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-lg mt-4">
+                    <p class="text-xs text-yellow-800 font-medium flex items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Perhatian: Aplikasi ini mendeteksi kecurangan. Dilarang berpindah aplikasi, menutup layar, atau screenshot. Maksimal peringatan 3 kali.
+                    </p>
+                </div>
+
+                <button onclick="startExam()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition-colors mt-6">
+                    Mulai Kerjakan
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= Halaman Ujian ================= -->
+        <div id="exam-page" class="hidden flex-col h-full bg-gray-50">
+            <!-- Header -->
+            <div class="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center z-10">
+                <div>
+                    <h2 class="font-bold text-sm" id="header-name">Nama Siswa</h2>
+                    <p class="text-xs text-blue-200" id="header-class">Kelas 4</p>
+                </div>
+                <div class="text-right">
+                    <div class="bg-red-500 px-3 py-1 rounded-full text-xs font-bold border border-red-400 shadow-inner flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Peringatan: <span id="warning-count" class="ml-1">0/3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Soal (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col">
+                
+                <!-- Navigasi Nomor Soal -->
+                <div class="bg-white p-2 rounded-lg shadow-sm border border-gray-200 mb-4 overflow-x-auto whitespace-nowrap hide-scrollbar">
+                    <p class="text-xs font-semibold text-gray-500 mb-1">Navigasi Soal:</p>
+                    <div id="question-navigator" class="inline-flex gap-1.5">
+                        <!-- Navigator buttons injected here -->
+                    </div>
+                </div>
+
+                <!-- Kontainer Pertanyaan -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 flex-1 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">Soal <span id="current-question-num">1</span> / 20</span>
+                    </div>
+                    <p id="question-text" class="text-gray-800 font-medium leading-relaxed mb-5 text-sm sm:text-base">
+                        <!-- Question text injected here -->
+                    </p>
+                    <div id="options-container" class="space-y-3 mt-auto">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Navigasi Prev/Next -->
+            <div class="bg-white p-4 border-t border-gray-200 flex justify-between items-center z-10">
+                <button onclick="prevQuestion()" id="btn-prev" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-200 disabled:opacity-50 transition-colors">
+                    Sebelumnya
+                </button>
+                <button onclick="nextQuestion()" id="btn-next" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">
+                    Selanjutnya
+                </button>
+                <button onclick="confirmSubmit()" id="btn-submit" class="hidden px-4 py-2 bg-green-600 text-white rounded-lg font-medium text-sm hover:bg-green-700 transition-colors">
+                    Kumpulkan
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= Halaman Hasil ================= -->
+        <div id="result-page" class="hidden flex-col h-full bg-white p-6 justify-center items-center text-center">
+            <div id="result-icon" class="w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-green-100 text-green-600">
+                <!-- Icon disuntikkan via JS -->
+            </div>
+            <h2 id="result-title" class="text-2xl font-bold text-gray-900 mb-2">Ujian Selesai!</h2>
+            <div id="result-subtitle" class="text-gray-500 mb-6">Terima kasih telah mengerjakan dengan jujur.</div>
+            
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 w-full max-w-sm mb-6">
+                <div id="loading-indicator" class="hidden mb-4">
+                    <div class="flex items-center justify-center space-x-2">
+                        <div class="w-4 h-4 bg-blue-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
+                        <div class="w-4 h-4 bg-blue-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
+                        <div class="w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Menyimpan nilai ke Spreadsheet...</p>
+                </div>
+                <div id="save-status" class="hidden mb-4 text-sm font-medium"></div>
+
+                <p class="text-sm text-gray-500 font-medium mb-1">Nilai Akhir</p>
+                <p id="final-score" class="text-5xl font-black text-blue-600">100</p>
+            </div>
+
+            <div class="w-full text-left bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
+                <p><strong>Nama:</strong> <span id="result-name"></span></p>
+                <p><strong>Kelas:</strong> 4</p>
+                <p><strong>Total Pelanggaran:</strong> <span id="result-warnings">0</span> kali</p>
+            </div>
+        </div>
+
+        <!-- ================= Custom Modals ================= -->
+        
+        <!-- Modal Overlay -->
+        <div id="modal-overlay" class="hidden absolute inset-0 bg-black/60 z-40 backdrop-blur-sm flex justify-center items-center p-4">
+            <!-- Modal Box -->
+            <div id="custom-modal" class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col modal-enter">
+                <div id="modal-header" class="p-4 border-b border-gray-100 flex items-center">
+                    <div id="modal-icon" class="mr-3"></div>
+                    <h3 id="modal-title" class="font-bold text-lg text-gray-900">Judul</h3>
+                </div>
+                <div class="p-5">
+                    <p id="modal-message" class="text-gray-600 text-sm leading-relaxed">Pesan modal disini.</p>
+                </div>
+                <div id="modal-footer" class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
+                    <!-- Buttons injected here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Soal
+        const questionsData = [
+            { id: 1, text: "Aturan dibuat agar kehidupan bersama menjadi ....", options: ["A. bebas tanpa batas", "B. tertib dan teratur", "C. ramai dan berisik", "D. sulit dilakukan"], answer: 1 },
+            { id: 2, text: "Contoh aturan di sekolah adalah ....", options: ["A. datang ke sekolah tepat waktu", "B. bermain sepanjang pelajaran", "C. membuang sampah sembarangan", "D. berbicara ketika guru menjelaskan"], answer: 0 },
+            { id: 3, text: "Sesuatu yang seharusnya kita terima disebut ....", options: ["A. aturan", "B. kewajiban", "C. hak", "D. norma"], answer: 2 },
+            { id: 4, text: "Sesuatu yang harus kita lakukan dengan penuh tanggung jawab disebut ....", options: ["A. hak", "B. kewajiban", "C. hadiah", "D. kebebasan"], answer: 1 },
+            { id: 5, text: "Salah satu hak siswa di sekolah adalah ....", options: ["A. mendapatkan pembelajaran", "B. datang terlambat", "C. merusak fasilitas sekolah", "D. tidak mengerjakan tugas"], answer: 0 },
+            { id: 6, text: "Salah satu kewajiban siswa di sekolah adalah ....", options: ["A. mendapatkan nilai", "B. menggunakan fasilitas sekolah", "C. mengerjakan tugas", "D. mendapatkan perlindungan"], answer: 2 },
+            { id: 7, text: "Berikut yang bukan merupakan contoh penerapan norma dalam kehidupan sehari-hari adalah ....", options: ["A. Mengucapkan salam ketika bertemu guru", "B. Menghormati orang yang lebih tua", "C. Membuang sampah sembarangan", "D. Berbicara dengan sopan kepada teman"], answer: 2 },
+            { id: 8, text: "Ketika bertemu guru, sikap yang sesuai dengan norma kesopanan adalah ....", options: ["A. berpaling dan pergi", "B. menyapa dengan sopan", "C. berteriak", "D. mengejek"], answer: 1 },
+            { id: 9, text: "Contoh kewajiban anak di rumah adalah ....", options: ["A. mendapatkan kasih sayang", "B. mendapatkan makanan", "C. membantu orang tua sesuai kemampuan", "D. mendapatkan tempat tinggal"], answer: 2 },
+            { id: 10, text: "Jika setiap orang melaksanakan kewajibannya dengan baik, kehidupan akan menjadi ....", options: ["A. kacau", "B. tidak adil", "C. tertib dan harmonis", "D. penuh pertengkaran"], answer: 2 },
+            { id: 11, text: "(Soal HOTS) Raka ingin menggunakan perpustakaan sekolah. Namun, ia melihat ada aturan untuk menjaga ketenangan. Sikap yang sebaiknya dilakukan Raka adalah ....", options: ["A. tetap berbicara keras karena itu haknya", "B. mematuhi aturan agar orang lain dapat membaca dengan nyaman", "C. keluar dari perpustakaan", "D. meminta orang lain yang menjaga ketenangan"], answer: 1 },
+            { id: 12, text: "(Soal HOTS) Dina mendapat hak menggunakan fasilitas kelas. Setelah selesai menggunakannya, ia melihat meja dan kursi menjadi berantakan. Apa yang sebaiknya Dina lakukan?", options: ["A. meninggalkannya karena sudah selesai digunakan", "B. meminta teman untuk membereskannya", "C. merapikan kembali sebagai bentuk kewajiban dan tanggung jawab", "D. menunggu guru datang"], answer: 2 },
+            { id: 13, text: "(Soal HOTS) Saat berdiskusi, Beni ingin menyampaikan pendapat. Namun, temannya sedang berbicara. Sikap yang tepat adalah ....", options: ["A. langsung memotong pembicaraan", "B. berbicara lebih keras", "C. menunggu temannya selesai berbicara", "D. meninggalkan kelompok"], answer: 2 },
+            { id: 14, text: "(Soal HOTS) Di kelas terdapat aturan untuk membuang sampah pada tempatnya. Suatu hari, Andi melihat sampah berserakan meskipun bukan dia yang membuangnya. Sikap yang paling tepat adalah ....", options: ["A. membiarkannya karena bukan sampahnya", "B. menyalahkan teman", "C. memungut dan membuang sampah pada tempatnya", "D. menunggu guru membersihkannya"], answer: 2 },
+            { id: 15, text: "(Soal HOTS) Setiap siswa memiliki hak untuk belajar dengan nyaman. Namun, beberapa siswa terus berbicara ketika guru menjelaskan. Perilaku tersebut dapat ....", options: ["A. membuat semua siswa semakin fokus", "B. mengganggu hak siswa lain untuk belajar", "C. membuat pelajaran lebih menyenangkan", "D. membantu guru mengajar"], answer: 1 },
+            { id: 16, text: "Perhatikan kegiatan berikut!\n1. Mendapatkan kasih sayang dari orang tua.\n2. Membantu membersihkan rumah.\n3. Mendapatkan makanan dan tempat tinggal.\n4. Merapikan tempat tidur sendiri.\nPasangan hak dan kewajiban yang tepat adalah ....", options: ["A. Hak: 1 dan 3; Kewajiban: 2 dan 4", "B. Hak: 1 dan 2; Kewajiban: 3 dan 4", "C. Hak: 2 dan 4; Kewajiban: 1 dan 3", "D. Semua merupakan hak"], answer: 0 },
+            { id: 17, text: "Sekolah memberikan kesempatan kepada semua siswa untuk menggunakan lapangan. Agar hak tersebut dapat dirasakan bersama, siswa sebaiknya ....", options: ["A. menggunakan lapangan selama mungkin", "B. berebut menggunakan lapangan", "C. membuat jadwal dan mematuhi aturan penggunaan", "D. melarang kelas lain menggunakannya"], answer: 2 },
+            { id: 18, text: "Sinta melihat temannya melakukan kesalahan. Ia ingin mengingatkan temannya, tetapi tidak ingin membuatnya malu. Cara yang sesuai norma kesopanan adalah ....", options: ["A. menegurnya dengan keras di depan semua orang", "B. mengejek kesalahannya", "C. mengingatkannya dengan bahasa yang baik", "D. menceritakan kesalahannya kepada teman lain"], answer: 2 },
+            { id: 19, text: "Mengapa hak dan kewajiban harus dilaksanakan secara seimbang?", options: ["A. Agar kita hanya mendapatkan hak", "B. Agar kita bebas melakukan apa saja", "C. Agar kehidupan bersama berjalan tertib dan adil", "D. Agar kewajiban dapat dihindari"], answer: 2 },
+            { id: 20, text: "Kelas 4 memiliki aturan bahwa setiap siswa mendapat giliran piket. Suatu hari, seorang siswa tidak mau melaksanakan piket karena merasa itu bukan pekerjaannya. Jika kebiasaan tersebut dilakukan banyak siswa, apa yang mungkin terjadi?", options: ["A. Kelas menjadi semakin bersih", "B. Kegiatan piket menjadi lebih mudah", "C. Kelas menjadi kotor dan aturan tidak berjalan dengan baik", "D. Semua siswa mendapatkan hak lebih banyak"], answer: 2 }
+        ];
+
+        // State Aplikasi
+        let state = {
+            studentName: '',
+            currentIndex: 0,
+            answers: new Array(20).fill(null), // Array untuk menyimpan jawaban siswa (indeks jawaban 0-3)
+            warnings: 0,
+            maxWarnings: 3,
+            isActive: false,
+            isFinished: false
+        };
+
+        // GANTI URL INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+        const GOOGLE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxn3vdlEIui34QoyDdncCJW32szpz-FUG10kPGvFhv8optHk-9u15YByaz3T7RocjE49A/exec'; // CONTOH URL
+
+        // Cache elemen DOM
+        const pages = {
+            login: document.getElementById('login-page'),
+            exam: document.getElementById('exam-page'),
+            result: document.getElementById('result-page')
+        };
+        const modal = {
+            overlay: document.getElementById('modal-overlay'),
+            title: document.getElementById('modal-title'),
+            message: document.getElementById('modal-message'),
+            icon: document.getElementById('modal-icon'),
+            footer: document.getElementById('modal-footer')
+        };
+
+        
+        // Memulai Ujian
+        function startExam() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            if (!nameInput) {
+                showModal('Peringatan', 'Silakan isi Nama Lengkap terlebih dahulu.', 'warning');
+                return;
+            }
+            
+            state.studentName = nameInput;
+            state.isActive = true;
+            
+            document.getElementById('header-name').innerText = state.studentName;
+            
+            pages.login.classList.add('hidden');
+            pages.exam.classList.remove('hidden');
+            pages.exam.classList.add('flex');
+            
+            // Coba fullscreen untuk meminimalisir cheat (bekerja bila diizinkan browser)
+            try {
+                if(document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(e => console.log(e));
+                }
+            } catch(e) {}
+
+            renderQuestion();
+            renderNavigator();
+        }
+
+        // Render Pertanyaan Saat Ini
+        function renderQuestion() {
+            const q = questionsData[state.currentIndex];
+            document.getElementById('current-question-num').innerText = state.currentIndex + 1;
+            
+            // Format soal yang memiliki enter (\n)
+            let formattedText = q.text.replace(/\n/g, '<br>');
+            document.getElementById('question-text').innerHTML = formattedText;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const isChecked = state.answers[state.currentIndex] === index;
+                const optId = `opt-${index}`;
+                
+                const label = document.createElement('label');
+                label.className = `block w-full border ${isChecked ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'} rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors flex items-start`;
+                
+                label.innerHTML = `
+                    <div class="flex items-center h-5">
+                        <input type="radio" name="answerGroup" value="${index}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" ${isChecked ? 'checked' : ''} onchange="selectAnswer(${index})">
+                    </div>
+                    <div class="ml-3 text-sm flex-1">
+                        <span class="${isChecked ? 'font-semibold text-blue-800' : 'text-gray-700'}">${opt}</span>
+                    </div>
+                `;
+                optionsContainer.appendChild(label);
+            });
+
+            // Update Tombol Navigasi
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            btnPrev.disabled = state.currentIndex === 0;
+            
+            if (state.currentIndex === questionsData.length - 1) {
+                btnNext.classList.add('hidden');
+                btnSubmit.classList.remove('hidden');
+            } else {
+                btnNext.classList.remove('hidden');
+                btnSubmit.classList.add('hidden');
+            }
+        }
+
+        // Menyimpan Jawaban
+        function selectAnswer(optIndex) {
+            state.answers[state.currentIndex] = parseInt(optIndex);
+            renderQuestion(); // Re-render to show selected style
+            renderNavigator(); // Update color in navigator
+        }
+
+        // Render Kotak Navigasi Soal
+        function renderNavigator() {
+            const navContainer = document.getElementById('question-navigator');
+            navContainer.innerHTML = '';
+            
+            for (let i = 0; i < questionsData.length; i++) {
+                const btn = document.createElement('button');
+                const isAnswered = state.answers[i] !== null;
+                const isActive = i === state.currentIndex;
+                
+                let baseClass = "w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center transition-all border flex-shrink-0 ";
+                
+                if (isActive) {
+                    baseClass += "ring-2 ring-offset-1 ring-blue-500 ";
+                }
+
+                if (isAnswered) {
+                    baseClass += "bg-green-500 text-white border-green-600 shadow-sm";
+                } else {
+                    baseClass += "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200";
+                }
+                
+                btn.className = baseClass;
+                btn.innerText = i + 1;
+                btn.onclick = () => {
+                    state.currentIndex = i;
+                    renderQuestion();
+                    renderNavigator();
+                };
+                navContainer.appendChild(btn);
+            }
+        }
+
+        function nextQuestion() {
+            if (state.currentIndex < questionsData.length - 1) {
+                state.currentIndex++;
+                renderQuestion();
+                renderNavigator();
+            }
+        }
+
+        function prevQuestion() {
+            if (state.currentIndex > 0) {
+                state.currentIndex--;
+                renderQuestion();
+                renderNavigator();
+            }
+        }
+
+        // Konfirmasi Submit
+        function confirmSubmit() {
+            const answeredCount = state.answers.filter(a => a !== null).length;
+            const total = questionsData.length;
+            const unanswered = total - answeredCount;
+            
+            let msg = `Kamu telah menjawab <b>${answeredCount}</b> dari <b>${total}</b> soal.`;
+            if (unanswered > 0) {
+                msg += `<br><span class="text-red-500 mt-2 block">Masih ada <b>${unanswered}</b> soal yang belum dijawab!</span>`;
+            }
+            msg += `<br><br>Yakin ingin mengumpulkan jawaban sekarang?`;
+
+            showModal('Konfirmasi Selesai', msg, 'confirm', () => {
+                finishExam(false);
+            });
+        }
+
+        // Menyelesaikan Ujian dan Hitung Nilai
+        function finishExam(isForced = false) {
+            state.isActive = false;
+            state.isFinished = true;
+            closeModal();
+            
+            // Hitung nilai (Max 100, 20 soal = 5 poin / soal)
+            let correctCount = 0;
+            state.answers.forEach((ans, idx) => {
+                if (ans === questionsData[idx].answer) {
+                    correctCount++;
+                }
+            });
+            const finalScore = correctCount * 5;
+
+            // Tampilkan UI Result
+            pages.exam.classList.add('hidden');
+            pages.exam.classList.remove('flex');
+            pages.result.classList.remove('hidden');
+            pages.result.classList.add('flex');
+            
+            document.getElementById('final-score').innerText = finalScore;
+            document.getElementById('result-name').innerText = state.studentName;
+            document.getElementById('result-warnings').innerText = state.warnings;
+
+            const iconContainer = document.getElementById('result-icon');
+            const titleContainer = document.getElementById('result-title');
+            
+            if (isForced) {
+                iconContainer.className = "w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-red-100 text-red-600";
+                iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+                titleContainer.innerText = "Ujian Dihentikan!";
+                titleContainer.classList.add('text-red-600');
+                document.getElementById('result-subtitle').innerText = "Kamu melakukan pelanggaran maksimal. Jawaban otomatis dikumpulkan.";
+            } else {
+                iconContainer.className = "w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-green-100 text-green-600";
+                iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+            
+            // Simpan data ke Spreadsheet
+            saveToSpreadsheet(state.studentName, "Kelas 4", finalScore, state.warnings);
+
+            // Exit fullscreen if active
+            try {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen().catch(e => console.log(e));
+                }
+            } catch(e) {}
+        }
+
+        function saveToSpreadsheet(nama, kelas, nilai, pelanggaran) {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const saveStatus = document.getElementById('save-status');
+            
+            loadingIndicator.classList.remove('hidden');
+            saveStatus.classList.add('hidden');
+
+            const timestamp = new Date().toLocaleString('id-ID');
+            
+            // Menyiapkan data URL encoded
+            const data = new URLSearchParams();
+            data.append('timestamp', timestamp);
+            data.append('nama', nama);
+            data.append('kelas', kelas);
+            data.append('nilai', nilai);
+            data.append('pelanggaran', pelanggaran);
+
+            fetch(GOOGLE_SHEET_WEBAPP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Penting untuk menghindari error CORS saat mengirim ke Google Script
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: data
+            })
+            .then(() => {
+                // Karena no-cors, kita asumsikan berhasil jika tidak masuk ke catch
+                loadingIndicator.classList.add('hidden');
+                saveStatus.classList.remove('hidden');
+                saveStatus.classList.add('text-green-600');
+                saveStatus.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Berhasil disimpan ke sistem.';
+            })
+            .catch((error) => {
+                loadingIndicator.classList.add('hidden');
+                saveStatus.classList.remove('hidden');
+                saveStatus.classList.add('text-red-600');
+                saveStatus.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Gagal menyimpan data. Pastikan internet stabil.';
+                console.error('Error saving data:', error);
+            });
+        }
+        
+        let debounceCheat = false;
+
+        function triggerCheatViolation() {
+            if (!state.isActive || state.isFinished || debounceCheat) return;
+            
+            debounceCheat = true;
+            setTimeout(() => { debounceCheat = false; }, 1000); // Mencegah multi-trigger berdekatan
+
+            state.warnings++;
+            document.getElementById('warning-count').innerText = `${state.warnings}/${state.maxWarnings}`;
+            
+            if (state.warnings >= state.maxWarnings) {
+                // Selesai Otomatis
+                showModal('Pelanggaran Maksimal', 'Kamu telah melakukan pelanggaran 3 kali (Keluar aplikasi/Pindah Tab/Screenshot). Ujian dihentikan dan jawaban dikumpulkan otomatis.', 'error', () => {
+                    finishExam(true);
+                });
+                // Paksa finish jika modal tidak diklik
+                setTimeout(() => { if(!state.isFinished) finishExam(true); }, 5000);
+            } else {
+                // Peringatan
+                showModal('Peringatan Kecurangan!', `Sistem mendeteksi kamu mencoba keluar jendela aplikasi, berpindah tab, atau melakukan screenshot.\n\nPeringatan: ${state.warnings} dari ${state.maxWarnings}.\n\nJika mencapai 3 kali, ujian akan dihentikan otomatis.`, 'warning');
+            }
+        }
+
+        // 1. Deteksi Pindah Tab / Jendela diminimize
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') {
+                triggerCheatViolation();
+            }
+        });
+
+        // 2. Deteksi kehilangan fokus jendela
+        window.addEventListener("blur", () => {
+            // Berlaku hanya di desktop biasanya, tapi sebagai jaring pengaman tambahan
+            triggerCheatViolation();
+        });
+
+        // 3. Matikan kombinasi keyboard (F12, PrintScreen, Ctrl+C dll)
+        document.addEventListener('keydown', (e) => {
+            if (!state.isActive) return;
+            
+            // F12 atau Ctrl+Shift+I (DevTools)
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+                triggerCheatViolation();
+            }
+            // Ctrl+C, Ctrl+V (Copy Paste)
+            if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
+                e.preventDefault();
+                triggerCheatViolation();
+            }
+            // Print Screen
+            if (e.key === 'PrintScreen') {
+                e.preventDefault();
+                triggerCheatViolation();
+            }
+        });
+
+        // 4. Mencegah klik kanan
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // 5. Mencegah seleksi teks (sebagai tambahan perlindungan CSS)
+        document.addEventListener('selectstart', (e) => {
+            e.preventDefault();
+        });
+
+
+        // Fungsi Modal Custom
+        function showModal(title, message, type = 'info', onConfirm = null) {
+            modal.title.innerText = title;
+            modal.message.innerHTML = message;
+            modal.footer.innerHTML = '';
+            
+            // Atur Icon
+            if (type === 'warning') {
+                modal.icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+            } else if (type === 'error') {
+                modal.icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'confirm') {
+                modal.icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else {
+                modal.icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+
+            // Atur Tombol
+            if (type === 'confirm') {
+                const btnCancel = document.createElement('button');
+                btnCancel.className = "px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors";
+                btnCancel.innerText = "Batal";
+                btnCancel.onclick = closeModal;
+
+                const btnOk = document.createElement('button');
+                btnOk.className = "px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors";
+                btnOk.innerText = "Ya, Kumpulkan";
+                btnOk.onclick = () => {
+                    closeModal();
+                    if (onConfirm) onConfirm();
+                };
+
+                modal.footer.appendChild(btnCancel);
+                modal.footer.appendChild(btnOk);
+            } else {
+                const btnOk = document.createElement('button');
+                btnOk.className = "px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors w-full";
+                btnOk.innerText = "Mengerti";
+                btnOk.onclick = () => {
+                    closeModal();
+                    if (onConfirm) onConfirm();
+                };
+                modal.footer.appendChild(btnOk);
+            }
+
+            modal.overlay.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            modal.overlay.classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
